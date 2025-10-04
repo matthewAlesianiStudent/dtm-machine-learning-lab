@@ -1,0 +1,677 @@
+Which is the screen I should share, this one. Okay, and slides. Oh, come on. Okay, so,
+
+The topic for today's class is MapReduce, which is the most common programming paradigm for big data analysis. And we will do an experiment today. So we'll try something new and then I will collect your feedback on this activity. So what we're going to do is
+
+an exercise to learn about this paradigm which I call the real MapReduce exercise. So essentially there's a bunch of people over here that I would like to exploit. So we talked about clusters that work together to achieve a common goal by doing tasks. So today you will be the cluster. Each of you will be
+
+a machine, okay, of a cluster. So all together we form a cluster. I will give you the data, I will give you tasks, and you will do an exercise to do some data analysis. All right, so how does it work? I'm gonna subdivide you into groups, and the groups that we will do in order to facilitate communications will be these. By the way, is there someone here who is not following the course, or is just here?
+
+using a computer for other reasons just to understand if there's... Because some people were asking me if they could come and join us to use the computers, but alright. So this line here is one cluster. These two lines here are another cluster. These two lines here are another cluster. These two lines here are another cluster. And the last line is another cluster. Alright?
+
+So it's one, two, three, four and five. All right. So I need to distribute the data, which I have here in these pieces of paper. Okay, so I'm thinking about a fast way to do this. Let's take one people from every cluster. If you can come here, I will give you...
+
+Okay, so you need to take one of each. Okay, take one of each and give it to the others.
+
+Okay, that's not taking it in one piece. Okay. So let's try this again. Take one for yourself as well. Okay. All right. And then one for each. Okay.
+
+I didn't know how many people there would be so I didn't prepare the subdivision of data. Apologies for that.
+
+Okay, so now you can go back to your groups and distribute. So you should have eight pieces of paper. Okay, distribute them. And if you...
+
+Okay, some of the people will be without a card probably inside the cluster, but that's fine. Okay. Okay.
+
+So what you have in your hands, what some of you have in your hands is a piece of a data set about e-commerce sales. Of course this is fake data which I generated with a simple tool and it's a block of data, right? So assume that you're using HDFS and you're the data knowledge storing a block of the data.
+
+We assume no replication for simplicity, otherwise I will have to distribute another two copies of each block. So data is spread in blocks across the machines. What we want to do is to collaborate to answer a simple analytical question. And we will do this in two steps. So the first exercise that I want you to do is
+
+Just to think about how you would proceed in carrying out this task. So I, the user, the application, I want to know what is the total revenue. You should have a column that is called amount. So I want to know what is the total amount by category. All right. So you have a bunch of information in the blog about the person, about the date and so on.
+
+I want to know the total revenue by category. So think about how this task can be accomplished. There is a constraint that you can only exchange data with the others. So you're the machines, right? So you can do tasks on the data that you have. You can communicate with the others, but only by sending others pieces of data.
+
+You cannot tell them to do specifically something, right? So the point is, we have to agree on a methodology in order to, on a paradigm, let's say, in order to carry out this task. So everyone has to be already aware of what they have to do.
+
+we don't have to communicate at the time of the task, at the time of executing this task, what each has to do. We already have to know what we have to do. So the point is, how would you proceed in doing this operation, knowing that machines can only exchange data?
+
+Someone else cannot tell you, "Okay, I gave you this in this format, then you should do that." Okay? Everyone should already be aware of what they have. So, what should be the methodology in order to carry out this task in such a way? Okay? Think about it, couple of minutes on your own. Okay? Just think about it. Then discuss it in groups. I'll give you some minutes to do it.
+
+And then we discuss it. But if you already want to start talking in groups, it's fine.
+
+So the point is Of course there's gonna have to be some exchange right because the data is scattered so the point is how do you
+
+do this exchange and make it so that you're able to compute the total without exchanging coins.
+
+Yeah.
+
+Oh, for each category. Ah, okay.
+
+So the point is, if you want, at this point, you can already, the point would be, let's first discuss about how we will proceed in doing so. And then when you actually do the work, you exchange only data. So first you agree on the methodology, then you carry out the tasks.
+
+in a way so that you're able to compute these totals by category. Professor, what does the amount of the total amount of the amount of the total amount of the amount by category?
+
+No, no, no. Is it amount of items? No, no, no. It's the price. The price, yes. The total amount, essentially. Yeah, because we have the external player. Yes, yes, yes. So you're going to have to do some work for it. Yes. Yes.
+
+Okay, so...
+
+All right.
+
+um
+
+yes
+
+Professor, is this related to my previous? Yes, of course. But don't look for... No, I mean... The whole point is... Yes. Yes.
+
+There we go.
+
+Yeah.
+
+Thank you.
+
+Okay.
+
+All right, two more minutes and then we discuss.
+
+... ... ... ... ... ... ...
+
+All right.
+
+Thank you.
+
+um um
+
+Thank you.
+
+Okay, all right, time's up. Let's go back to your original seats.
+
+Group number two, okay. Are you okay? Okay. All right, so what came up in the groups? Is there anyone who wants to share what they think would be a good way to proceed? Yes. We came up with the concept that first we should agree on
+
+For example, since we have different currencies, we have to unify the currency that we will use during the calculations. And then we...
+
+Just everything we have. Yes, okay. This is a correct observation. So they notice that there are different currencies in the data. So ultimately there are some transformations that need to be done in order to make data homogeneous under the point of view of the currency, right? So there are some
+
+let's say, pre-processing slash transformation of the data for the currency.
+
+This doesn't work very well. This is even worse. Okay, I will stick with the black, which is maybe a bit better. All right, okay, what else?
+
+Yes. All right.
+
+Yes, of course, you do not know exactly how many currencies are there, how many categories are there, that's true.
+
+Okay, so there is some
+
+exchange of information between the machines, right? So there is some data exchange where the number, yeah, but besides the currency, the main point is that you don't know exactly how many categories will be there, right? And who is, how do you
+
+carry out this exchange? I mean, ultimately the point is what do the single machines do? Okay, so you calculate the total on what you have on the piece of data that you have. Okay, so calculate
+
+Calculate... We can call it a partial total. Yeah, sorry about people in the back. Okay, and then you...
+
+Share the total? Yes, like the effect. Share the piece of data. Okay, what is a shared piece of data? Okay, okay, that you pass one to another. Okay, so then data exchange means then you pass, come on.
+
+Best totals the same one to another. Okay, this is a way to proceed. Any other alternatives?
+
+have alternatives to what? To the methodology. So ultimately the idea here is you do some transformation on your data to agree or to unify the currency, let's say. Each machine calculates a partial total. Ultimately there is some data exchange in the middle so that you compute total, the final totals incrementally. So like the first one
+
+shares the total with the second one, they merge, then they pass the total to the third, they merge, and so on. And then the last one, of course, will compute the final total. This is a way to proceed, but there could be a different way. I don't know if anyone else... Do you agree with this methodology, or do you think that
+
+machines could be more efficient in a different way, yes. Sorry, I'll get closer because I have the mic here. So you don't shout. Uh-huh.
+
+Okay. But this is already what we're doing.
+
+It's like we have a data lake. And we're doing so. You wouldn't do transformation of currency, but then how do you, if you have products that are sometimes sold in euros and sometimes in dollars, and you want to know the total, how do you do it? They wouldn't do
+
+Okay, so the point is you wouldn't mix them from a business perspective, but you would keep. Okay, but let's say that we want to. Because your manager said that we want the total overall. Then you have to do the job. But okay, I understand the point. Okay. Methodology is speaking at the level of the paradigm. So you think this is the best?
+
+Well, do we pass from one post to another? Maybe it would be a bit more efficient to have one post where we calculate everything, so other posts pass their data to one single post instead of... Okay, okay, this is an alternative. So instead of passing one to another, you can say that there is only one...
+
+that is in charge of computing totals. So ultimately, all the partial totals are given to just a single person that does everything, correct? They understand correctly, okay? All right, so among these two alternatives,
+
+Let's raise hands to see which one is probably, you think is best. Raise your hands for passing totals and computing incrementally. No, that is not, I don't give scores based on this, so don't be scared. There was hesitant, yes, come on. Five more or less, six, all right. This one, all right, a bit more. Okay, so this one wins.
+
+all right so i would say that this one is slightly better because this one involves exchanging a lot of i mean it's incremental so if you have a lot of machines and you have thousands of machines then doing it incrementally means that it takes a long time right whereas this one you send
+
+All the data exchange happens at once towards one person, towards one machine, and then produce everything. But then what about if, okay, in this case we have three categories, right? So it's not a lot of work, but what if we have a thousand categories with huge amounts of data?
+
+Maybe it could be... Okay, sorry, maybe someone else? I thought voices from someone. Ah, you, okay, sorry. Maybe it's like, for example, having multiple calculation machines, and then multiple other machines that are... Okay, yes, exactly. So, many in charge of... in charge of all tools.
+
+Okay, so like each one handles a single category. Okay, so then you distribute the work a bit more. Okay, exactly. This is the proper way to go. All right. So ultimately, the tasks that we have to do, okay, we laid them out correctly. So the work can be computed in two steps.
+
+Okay, so in the first step, as we said, we have machines, or you, who do some initial pre-processing on the data, working on the currency. So converting, the easiest thing that we can do is converting dollars to euros. We can use a simple ratio so that $10 make nine euros. Okay, so you don't have to do particular math
+
+So the only items with dollars are either 10 or 5, so they can be reduced to 9 and 4.5, more simply. Okay, then you calculate your partial totals, right? So I'm adding here a bit of a clause. So instead of computing just the totals by category, you compute them only considering the data for 2025. So I'm adding a filter in conditions. And then...
+
+The point is that we want to send these partial totals to someone who is in charge of computing the total for that category. So the way to do this is to write in a small piece of paper your partial total for each category, and then this data has to go to the person that is in charge of doing the total of the given category.
+
+Okay, so what I advise is to write down in separate pieces of paper the different totals because then you have to give each total to a different person. All right, then there will be a second task.
+
+only some of you will do this of course because the categories are three. So some of you will be dedicated to collecting the partial totals of a given category and compute the final total. All right. Okay, so I need the representatives of the clusters again so that I can share the tasks.
+
+So the point is that the U will not just work like this, but okay, so these I already split them into different parts.
+
+So these are the stats, which is essentially this, which are the instructions of what you have to do. And you can give them to, you can distribute to your people in the group, however you like.
+
+Of course, there are more people than blocks of data, so some of you will be idle in this. Maybe you can assist if you want the others, although it's not something that can happen in the cluster with machines helping each other, but still we can do this. And let me know when you have shared all the tasks.
+
+And after you've done this, wait in the beginning, all right? Because then I have to distribute the others as well. All right. What's happening here? What's the problem? Ah, you're still subdividing. Okay, okay. So, so, so...
+
+So if you notice, the task is not generic like this one, but it belongs to a specific block. So it says, do this on a specific block, right? So what I see that you're doing is not giving the tasks
+
+Randomly, if I understand correctly, how did you do it? Based on the slots. Based on the slots, right. I guess this is how everybody is doing? Which criteria are you using to make the task?
+
+Yeah, okay. What about here in this cluster? How are you sharing the tasks? Based on the... Alright. So do we have to calculate the... Yeah, it's okay. Wait until I give you the start. Oh, yes.
+
+So what you're doing here is applying the principle of data locality.
+
+which means if you just give the tasks randomly and I have the task of computing the total on block A, but block A is farther there, then it means that I have to talk to the person that has to give me the block and then I compute the partial total, right? But otherwise, if I can just give the task directly to the machine that holds the data,
+
+then of course there is no data exchange that has to happen, right? This is called applying the data locality principle. So move the task close to the data instead of moving the data to the task, right? It's easier, right? Of course it may happen that, not in this case, but in other cases where the machine is already... Don't start the exercise, I have to give you the start. All right.
+
+So it may happen that the machine is already doing something. So if I have the block A, but I'm already doing something that someone comes and says, well, you should do these and say, okay, I'm already full of stuff. Okay. Then the idea would be, okay, maybe I will look at the one next to you so that he will do, or she will do this and he will send the data to him or her. Right. So, so
+
+Still the idea would be give the task to someone that is close to you so that the transfer of data happens in a fast manner rather than someone who is far away. So this is how data locality works. All right. Okay, so I have distributed the first tasks. I have to distribute the second tasks as well. So I will...
+
+come over here and that will distribute them randomly. So some of you will also have the second task to compute the total of a given category.
+
+And then you can start.
+
+No, no, no, sorry. You already have this.
+
+So there's a little bit here. What did I give you? Okay. I gave you. Okay. Sorry. No. Okay.
+
+Remember that the whole line is the cluster. And technology. If you need...
+
+paper or pen to write the data exchange then I have
+
+I have some on the desk. I gave you technology. But only this time. Yes. Because I don't know where it doesn't matter. It's very close. Just... Okay, remember to follow...
+
+Okay.
+
+So the first task, you work on your data, you compute your partial totals, and write them. Okay. And then someone will come to collect.
+
+You're part of the...
+
+Thank you.
+
+Okay.
+
+Yes, my mom was a teacher. She was my teacher. For example, she told me about the fact that my mom was a teacher.
+
+You're still talking about different ways to do it.
+
+Yes, yes.
+
+Thank you.
+
+Thank you.
+
+OK, when a cluster finishes, let me know.
+
+- Our
+
+Overall? No, just the building. The overall? Okay. And the others are the cases, right? Yeah.
+
+Thank you.
+
+Okay, when the person in charge of a total has the total, come to me and tell me what is their total.
+
+So we see how much agreement we have. Do you have a total? Okay. So...
+
+Which cluster are you? Yes, okay. Second in my case is four. I'm starting from the window. Okay. So I have a total for clothing that is 95. Yeah. I have the same cluster for books. 55. Okay. It was the first cluster over there. Okay.
+
+I'm nothing and I am 80.5.
+
+Okay. Okay. Okay. Okay.
+
+For clothing, 77.26. 0.26? Yeah. All right. Technology, 85. Okay. All right.
+
+Okay, so two clusters are complete. There is some variability in the data, so okay. When we say veracity, okay, this is what we mean. This group is working, and you're working.
+
+And by the window, I see some confusion. Okay, I'm going to pull the plug in a couple of minutes, so if you did it okay, otherwise we will move on. Okay.
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+Okay. Okay. As in agreement. So it should be 77.5. Someone converted it. All right.
+
+Class number two, I see the issue is over here. You got it? Yeah, technology. Yeah.
+
+Okay, I'm missing books and closing for group number two.
+
+But yes. But okay. Anyway, I see that I put some question marks over here. Okay, you have books. Yes.
+
+48.5, wow, okay. - No, 25. - 25, sorry, yes. Yeah, it's even worse, I mean, there shouldn't be any... Yeah, I don't know. If the conversions are correct, then you have...
+
+60? 66. All right. 80. Okay. All right. So we can do an average, ultimately. Okay. So...
+
+Now, I do not know exactly what the correct totals are, because I didn't collect them, I didn't calculate them beforehand, but I will let you know. I will do the exact calculations and tell you who got it closer.
+
+interesting that you got all the different results. I mean, I expected maybe some differences, but not at this level. But, okay. By the way, if you can please then recollect the pieces of paper, and, okay, I will just, don't throw them away, I will pass along during the break. Okay, don't get up and just remember to keep them and I will collect them later. Yes.
+
+Okay, so any specific issues that you found during this exercise?
+
+I think that coordination was a bit challenging here. No, okay, so, okay, okay, conversion. That's human error, so that's why you rely on machines to do these kinds of jobs, exactly. - But should the results be the same with the different-- - Yes, the results should be the same. - Yes.
+
+Any other comments on the exercise? Yes.
+
+Yes.
+
+Yes, so if we want to do some check on where the error was, it's going to be quite difficult, yes. Well, now in this case, we have to consider the human factor, which is something that you cannot debug, essentially. But yes, doing some control, some checks on where the issue was, it's actually, yeah, in this case, quite difficult.
+
+Other comments? Things that you would have done differently knowing that how it went. If you had to do this again, would you reorganize the task in a different manner? Let's say. Maybe only double check of some constraints, like for example the year. Okay, well that's still part of the of the human. You mean, I mean, I expect the program to do this kind of
+
+with this kind of filter more precisely. Yes? Everyone should have a task too.
+
+So did you pass?
+
+Can you compute your partial total and share the whole partial total with everyone? Okay. So what they did here is... I don't know who is gonna need my partial total, so I will make multiple copies of it and then send it to everyone. Not everyone, but yeah, almost everyone. Okay. I have one topic for you. Okay, let me finish this, yes.
+
+Okay, in fact, the correct way to do it would be not for the person in charge of the first task to know what's going to happen next, because indeed this kind of problem can happen. The point is, it's the one in charge of the second task that should go and collect the partial total. So you don't know what's going to happen next, you just compute your partial total and you just keep it there.
+
+The other task has to compute the whole total, so it will come and collect from everyone else. I mean, then the one in charge of the second task knows that everyone probably has a partial total, so will just come and collect. In that case, it's going to be, of course, more efficient. Yes.
+
+Something similar. Okay. All right. Okay, so what you experienced in this exercise is exactly the MapReduce paradigm, right? So this, the first task that you did is essentially MapReduce is a paradigm that consists of two phases, a map phase and a reduce phase.
+
+The map is essentially a task that you can easily distribute to all the machines. All the machines can work locally on the data that they have to do some operation, a pre-processing, a calculation, whatever, but it's extremely parallelized, all right?
+
+And then you have a reduced step, which we call here the second task, which is where there is some exchange of the partial results that all the machines did locally. And then based on the recollection of these results, you compute a final total in this case, but it could be any kind of aggregation, any kind of combination of these partial results.
+
+Now, the crucial thing in this exercise is to understand how this data exchange happens. So the point is we wanted to compute the totals by category. So what you did is to group the data by category and then giving the data of the same category to the same person.
+
+So essentially what you did is subdividing, like modeling the data into key value pairs, where the key is the attribute that you use to redistribute the data, the category, and the value is whatever value you want to aggregate, which is the total amount. So then in the MapReduce paradigm,
+
+independently of what you have to do, independently of what the task has to do, the map reveals that the redistribution of data that happens in the needle is based on whatever you put in the key. So the map does something and provides an output in terms of key value pairs, in this case category and total amount. Then these partial results are redistributed across the cluster to make it so that
+
+all the output, the partial output with the same key ends up in the same machine. Then you can put the category, you can put if you want to compute the total by category and currency because you don't want to mix the currencies, then the key is the combination of category and currency. So then all the values with the same key end up in the same machine and then machines can carry out doing the second tasks.
+
+Okay, all right, I think then this concludes the exercise. Now we
+
+We look at the theory, so which I assume that is going to be simpler to look at now that you have experienced how it works. We can do this after the break, so I think, so we don't interrupt the explanation of the theory. We can do, well, 15 minutes, so we can do just one break today, all right? Then we finish a bit earlier. So we resume at 10, sorry, it's 19, 15.
+
+uh
+
+Oh, nice. Yeah, yeah, yeah, don't worry, don't worry. No, no, this one is fine. This one is fine. Yeah, this one is fine. Yeah, this one is fine.
+
+um
+
+-
+
+:
+
+I think the filter is a mess.
+
+Maybe someone didn't look well to filter the video. Because when I did it again, in the test, a little more contained, in reality it went... I didn't do it well.
+
+Okay.
+
+All right.
+
+... ... ... ... ... ... ...
+
+um
+
+Thank you.
+
+Okay.
+
+Okay.
+
+Thank you.
+
+Thank you.
+
+Thank you.
+
+Thank you.
+
+Thank you.
+
+um
+
+um
+
+No.
+
+I'm going to do the jabardis.
+
+*Mumbling*
+
+foreign
+
+.
+
+um
+
+I'm going to go ahead.
+
+No, but it's not like that.
+
+Hi.
+
+Thank you.
+
+- Yes. - So I have a question just out of curiosity, 'cause you said that you will be using AWS, correct? - Yes, that's gonna be module two. - Okay, but which services are we gonna be using on AWS? - Yes, okay, I don't know exactly because it will be . - Oh, okay, so he's gonna be . - Oh, okay, okay.
+
+I will do the module 2 for computers. I assume you will be speaking in English. No, okay. So, okay. We will use S3 for the storage. We will use EMR for the cluster with Spark. We won't be using Kubernetes for the clusters or not? No. But...
+
+We would also showcase the cluster that we created on-premise at the end of the class, where it is based on Docker. It's on-premise. And for using the...
+
+basically, like the services, are we supposed, are we expected to like write it as like infrastructure as food or like using Terraform to like deploy like the services from AWS or is it just like one of the AWS console or the... It's the AWS console, yes. And we will do a class dedicated to just do the setup. Oh, okay, okay. So it will not be a problem, hopefully.
+
+And you will use it in the project as well. Oh, yeah. Okay. Cool. Thank you. Yeah, sure.
+
+Oh, yeah.
+
+Thank you.
+
+I don't think it's a good idea.
+
+I don't know.
+
+All right, let's resume.
+
+Okay, so let's look at the theory now.
+
+Okay
+
+Okay, so I said that the exercise was to experience the MapReduce paradigm, but what is exactly the definition of MapReduce? Well, it's actually a bit...
+
+can be a bit confusing in the sense that we use the same term to refer to both the programming model and one of the tools that has been used for a long time to implement such paradigm. So, in terms of paradigm, we say MapReduce is a programming model
+
+and then associated implementation for processing and generating large data sets. And it says here, you just specify a map function that processes key value pairs. So key value pairs are the key data model that is used in this paradigm to generate a set of intermediate key value pairs. So this intermediate output, I mean, this refers to the input
+
+which, okay, does not necessarily have into key value pairs. In fact, you had a data set that had multiple columns. It can be text, it can be whatever. But the important thing is that you generate a set of intermediate key value pairs, like category and total amount, and a reduced function that merges these intermediate values associated with the same key, right?
+
+And then we use the same term to refer to the implementation of Hadoop. So if you remember, Hadoop is this framework that was initially developed based on the Google papers, which includes
+
+three modules. It includes HDFS, the distributed price system that we saw yesterday, MapReduce, which is an implementation of this paradigm, and YARN, which is the resource negotiator that we will study, I think, in the next class.
+
+Now HDFS and YARN are still commonly used. MapReduce as an implementation of Hadoop has become quite obsolete and unless there are legacy reasons to use this, I don't think that anyone uses that implementation today because it's not very efficient. We will see why and we will see what is the tool that is currently used.
+
+So the goal of MapReduce is to support analytical jobs, as we said. And the pattern of an analytical job is more or less always to say, well, in the simpler, in the simple version, it usually follows this pattern. So you iterate over a large number of records, like the data set of sales that we have. You extract something from interest. So you do the pre-processing here.
+
+to fix the currency, to, well, I don't know, extract only what you want. You had a lot of information in the block. You had the date, you had the... I don't remember what you had, I put it away already. But, okay, like the product ID, a whole bunch of information that you don't need, so you can just discard those information.
+
+aggregate the results to compute the average salary by department, the total amount by category, and then you save the results somewhere. And this follows very well this MapReduce
+
+pattern where you have two functions which translate into the two tasks, a map function, so something that you do locally on a machine, on a single piece of data, and then a reduce function which is a function that takes the intermediate values and computes a total. Sorry.
+
+Okay, these map and reduce functions actually come from functional programming, which is, well, as you know, there are
+
+Many ways to write programs are either with imperative programming where you just specify exactly what you have to do in each iteration. Like for instance here, I want to iterate over this list that I have over here to compute the length of the strings.
+
+So one way to do it is to specify a cycle where you go through each of the items and you say that for each item you want to compute the length of the name.
+
+So you have to explicitly define the cycle, whereas with functional programming you just specify what is the function that you want to apply on a given list. Essentially you do the same, but in a different... You do the same thing, but in a different way, and let's say that this functional way of programming is more suitable for a distributed environment.
+
+Now, this is just to present another use case, which is one that I worked on, I don't remember, last year probably, so quite recent. So we had this, we did this work with a trail agency that was selling routes for hotels, but was playing tickets
+
+on Trivago and other websites where of course they were competing with other agencies, with other companies to offer the best value for money, the best offers of course. So it was quite a large data set. So for instance, for each
+
+Every time that you go on the website and you look for, "I want to stay in Rome for tonight, something to stay,"
+
+In this period, the website returns 25 offers of different rooms. There are about 40 million searches that are made by users every day, which means overall you get 1 million offers that are returned on a daily basis. And they keep track of these offers that they make because then you want to do some optimization.
+
+So if a log is maintained, if you consider one kilobyte per offer, because you have a whole bunch of information that you want to keep, then it becomes one terabyte per day. So it was quite large as a use case.
+
+So you can see just a snapshot for instance of the information that we have. Here is the legend of some of the fields. So for instance you have the offer for a hotel on a given day in a city. Time to travel is how many days, in how many days I will have to go there. Okay, so the travel will be in four days, ten days.
+
+So how early I'm requesting the booking, how many nights I will stay, the size of my crew, in which market I am based on the client, price for the room, markup, which is essentially how much I will earn from this as a company selling, how much I will learn from this sale, cheapest market price, what is the price
+
+that other companies are offering, how many times this offer has been seen, how many times it has been clicked, how many times it has been booked. Now there's some information that comes from the internal system, but there's also information that comes, statistics that are collected from Frivaro. So on a daily basis you can collect these statistics to integrate with your data set and check, then do some analysis.
+
+So, for instance, what kind of queries would you want to do on this data set? In which countries do I make the most revenues? Okay, so for instance, aggregate by country to calculate the total market.
+
+what is the rate of converting impressions into clicks and clicks into bookings, right? So how many, what is the conversion, the division of the impression, how many, in which cases I'm able to convert these visits into clicks and clicks into bookings? In which combinations am I most competitive?
+
+over which hotels that might never be competitive, right? Because maybe you want to avoid sending offers in the cases where you know you're not competitive, you cannot offer anything better, so you can just save computation and avoid sending those offers and focus on those that you know you get profit from, right?
+
+By the way, notice, just for curiosity, that in some cases there is a negative markup, and this is actually not a mistake. In this use case, you may want to provide an offer where you actually lose money, because then your goal would be to sell something else.
+
+I don't remember the term but you know once you proceed with the booking like with planes then you get "oh do you want to upgrade the seat?" "Do you want to get an additional something?" All right, so on those services that you get the yes your revenue. So in some cases it makes sense. All right, so all of these queries are
+
+Of course, we have to compute them knowing that the data is distributed over multiple nodes, right? And all of them can be answered easily within the MapReduce paradigm. So, for instance, if I want to know what is the revenue that I make in each country, right? You can do a first map phase where, as we did for category and map,
+
+an amount, you take just the country and just the revenue, which you can compute by multiplying the markup of the single offer by the number of bookings. So there's a bit of transformation that happens here, like it could happen for the currency. So this operation is done in parallel by all the machines that host the different blocks of data.
+
+Then there is the exchange of this partial output, which we call shuffling. This is the key term that we use to indicate the redistribution of data that happens after the computation of the partial results. And you do it in a way so that, as we said, all the values with the same key end up in the same machine. Actually, it's not just
+
+shuffle, it's called shuffle and store for this operation, because in order to, of course in the same machine, they will end up potentially multiple keys. Okay, in our case, it was simple. So each one of you who was in charge of the second task received only one category compute. Okay, but in another situation, it's quite frequent where a machine may receive the values of multiple keys.
+
+And in that case, in order to compute the total, what you want to do is to sort all the values by key, so that then computing the total is straightforward. So that's why we call it shuffle and sort. And there is the reduce phase, which is where you go and compute the total revenue.
+
+Okay, so map operation, as we said, extracts the data in the form of key value pairs. The type of key value pair can be chosen by the programmer, right? So when you want to do this operation, you want to group by category, okay. You want to group by a combination of fields like category and currency, okay. Whatever, it's up to you, right? It's up to the designer, the programmer.
+
+Also, the value does not have to be exactly one. You want to compute multiple metrics, fine. You just create a value that is not just an integer or a number, but it's a combination of numbers or strings or dates, whatever, right? You want to see what is the earliest date where you sold something in a different country. Okay, still something that fits the MapReduce paradigm. Instead of doing the sum, you do the minimum on the dates, right?
+
+Okay, then the reduce operation defines how the values corresponding to the same keys must be aggregated or combined. Okay, so the interesting thing is that ultimately from the perspective of the programmer, of the designer, of the data scientist, whatever, what you have to do is just to define the behavior of the map and the reduce function.
+
+Okay, so all you have to do is that. Then you have the framework implementation, which could be Hadoop MapReduce or could be Spark, which handles everything else in the way that, in a similar way to how you did it, without errors, hopefully. Okay, so this goes into a bit more details of how the process works. So initially, the
+
+The input file is, assuming that you're working on a file, is subdivided into splits, which are not necessarily the same size of the blocks on HDFS. So, in theory, you have the possibility of deciding how much data each map has to handle.
+
+So you may want to assign to each mapper like a fraction of a block or maybe a multiple. Okay, I couldn't find the word. A multiple of blocks. All right. Now, of course, it's
+
+usually more efficient to give to each map task exactly one block because then hopefully the whole block is on the same machine and otherwise it's just a matter of collecting it from another instead of doing tractions or something different that make it easier to have it, they would make it more challenging to have it done in an optimized way. So usually
+
+they are aligned, but not necessarily. Okay, then you create a map task for each of these splits. Okay, so one map task for each block, essentially, which run the map function. All right, in fact, when I distributed the tasks, you had exactly one task per block. Okay, I didn't distribute more, I didn't distribute less.
+
+then the key that you pay out returned are stored in the local disk. So when you compute your partial totals, what the machines do is taking this output, this intermediate output, and storing locally in the disk. The local disk, not on HDFS. So remember that everything is based on HDFS, so we assume that
+
+or another distributed file system. So we assume that the first input is read from this distributed file system, but this intermediate output is not stored on the distributed one, but on the local one.
+
+There's no need to go to the distributed one, it would be overkill. I go through the distribution of an intermediate output that fits very well inside the local machine and does not need the replication that you would have in the distributed one. This intermediate output is sorted by key and subdivided into partitions, which is one bridge reducer. So now in your case, it was most
+
+Quite simple also because you already aggregated the output. But in the original MapReduce paradigm, this is something that does not necessarily happen. So if I go back here, okay, the result of the map function does not necessarily perform a pre-aggregation of the data, right? So you can have multiple values for the same key.
+
+So what you want to do in this case is to sort these values by the key because you know that all the values of the same key will have to go to the same producer. So that's why you have this sort at the end of the map task. Then the outputs are sent to the reduce tasks which collect the outputs from all the
+
+from all the matters which compute of course the function the reduced function that we have defined and the number of reduced tasks can be actually specified independently so it's up to the programmer to decide how many
+
+machines will be dedicated to carry out this task. So what we did in the simulation was to add one machine per key, right? But potentially I could have decided to use just one, right? So with just one person that handles all the three keys. Now, does it make sense? It depends, all right? So depending on the use case,
+
+you can tune this number of reducers and we will see how you can, what changes by tuning this number later on. So then the point is the reducer collects all the values with the same key, merges and sorts these keys. So essentially you do what I was saying here. It's not just shuffle, it's shuffle and sort.
+
+because you want to sort this data at the reduce side as well, because you're collecting, of course, from multiple mappers. And then, of course, you compute the total for every key that you have in the same reducer. Okay, this is just another picture to show, to display the same set of operations, but I think that at this point it's quite clear.
+
+Okay, this is yet another example where keys are just letters and values are numbers. But okay, I think we can skip this. We have many examples already. Okay, one of the typical
+
+programs that is showcased in MapReduce. The hello world, let's say, of MapReduce is the word count. So assume that you have a data set of text, you want to compute, you want to calculate how many times each word occurs in the data set, so you want to do a word count. In this case, in the MapReduce paradigm,
+
+You want to count the number of words, sorry, the number of occurrences per word. So you want to aggregate the data by word and do a simple count. So this means that in the paradigm, you want your intermediate output to be the words. And so every time you encounter a word, you produce a key value pair where the key is the word, and then you have a one just to indicate that it has occurred.
+
+And then of course you collect all these single appearances of the words and compute the total. I think that at this point this is also quite straightforward. Another example is computing the word length count. So how many words appear with a given length. I have a thousand words that are long, five characters.
+
+10 words that are long-term characters. Let's make an example. In this case, the key of the aggregation is the length. And again, you want to count appearances. So in this case, you want in the key, the length of a word and in the value, the number of appearances. Now, this is as far as the...
+
+the original MapReduce paradigm goes. Now there are additional things that you can do and the most important one is the combining, which is actually something pretty intuitive I would say because it's exactly what you already did in the simulation. Combining means pre-aggregating data on the map side instead of generating a lot of key value pairs
+
+where the key is repeated multiple times. Combining means that you already pre-aggregate the data. So the obvious advantage that you have with combining is that you have less data transfer. It's true that it adds more computation to the map where you don't have to just provide the key value first, you also have to aggregate. This adds a bit of burden, that's true.
+
+And it's not saving you from the fact that at the reduced side, you will have to do the final computation, the final aggregation as well. So it's not like you're taking much time away from what the reducer will do. But the key advantage with combining is that if you have less data, then you have less data transfer. And the transfer of data over the network is the thing that usually costs
+
+the more in this kind of operations. Because the network is low, we are on clusters with Ethernet cables, data on different racks are slower to communicate with each other. So the key aspect is minimizing. The key aspect for efficient execution is to minimize the amount of data that you want to transfer.
+
+So that's why the application of this combining operation is very important. Okay, so this essentially summarizes what I already said. Plus, there is a but. The but is that you cannot always do it, because from the programmer's perspective, you specify a map function and a reduce function, with the idea that
+
+the same reduce function is applied both on the map side to the pre-aggregation and on the reduce side to complete the final aggregation. Now this works very well if you have to do just a sum, but if you have an operation that is not associative or is not commutative, then this leads to problems. Now an example, so this is
+
+The example with the single characters and numbers, right? Where you want to do the total, in this case. So if you do a combining, which works only here actually, 6 plus 3 becomes 9, and then you have only one key to transfer instead of two. Not a lot of advantage, but just for the sake of the example.
+
+Now, an example of a non-commutative operation is the concatenation. So assume that you want to combine these keys by doing an alphabetical ordering of the characters, right? So for instance, in this case over here, you have two characters with the same key, which is three. So you do an alphabetical ordering, which becomes AZ.
+
+So this means that when you further concatenate this with the other values with three, which are u and h, since these are already merged together, then it becomes this, which is not the order combination of the characters. Whereas if you did it without combining, that you would have had at the end a result that is something like this, right?
+
+Now this concatenation is so, I couldn't find anything better. So maybe it's not super intuitive. What is more intuitive is a non associative function like the average, right? I want to compute the average by the key. So for instance here, nine and three becomes six. And then when I do, I use six to do the average with two and eight.
+
+I get this 5.33, which of course is not the same that I would have had if I just computed the simple average between these four values. It's the average of averages, which is different from the weighted average. So there are limits to this combining, which are still, in some cases, easily, there's an easy workaround.
+
+If you want to compute the average with combining, you can simply solve it by translating into, by not decoupling, but by splitting, let's say, the operation by computing the total, the sum of all the values as one value and the count of all the values as another value.
+
+So ultimately you subdivide this operation into two sums, right? And then in the final step you just divide the two total, right? So then you can compute the actual weighted average. So the only difference here is that instead of having as a value just the... instead of having the average,
+
+Here I have two values which are 12 as the sum and 2 as the number of values. Then when I reduce that, I'm able to compute the weighted average. So it's rather simple to overcome this problem, but it's something that the programmer must be aware of. Okay.
+
+Okay, then of course there is also the issue, the question of partitioning the map output, which means assigning to each key value pair in the output of the map the ID of the reducer that will manage that key. Okay, so the point is I want to
+
+indicate in my... I want to group my map output not just by the key but by the reducer who will handle those keys. Okay, because we said that a reducer may be in charge of multiple keys. So ultimately when a reducer comes to me
+
+to get the the partial output that I have prepared for such reducer, I want to give that reducer the whole map output that belongs to that reducer. So this means potentially multiple multiple keys. So
+
+Okay, this of course depends on how many reducers we have to find, so based on the number of reducers that we want, then we essentially subdivide the space of the keys into the number of reducers that we want. Okay, so for instance, if we have, I don't know, three reducers and we have 20 keys, 21 keys,
+
+What we want to do is to distribute these keys among these three reducers so that each of them will have more or less seven. So we have seven keys to each reducer and we do so by assigning, by associating a number to each key value pair which identifies this reducer.
+
+so that then we can sort by partition ID and create an output file that is all that I have to give to such reducer. Okay, so on the map side, now of course this issue of partitioning is strictly related to the number of tasks that will actually be executed on the cluster. So
+
+And this is true for both the map kind of tasks and the reduce kind of tasks. So on the map side, it's rather simple. You have the data that is already subdivided into blocks. So it makes sense, as we said earlier, to have one task for each block, depending on how the data is distributed and how many blocks
+
+the blocks are essentially partitions. So you already have the data partition, it makes sense to have one map task per split, per block. On the reducer side, as I anticipated, the number of reducers is actually tunable. So for instance, what you can do is to create one, based on the resources that you have available in the cluster, to have one reducer per machine.
+
+which in some cases might be an overkill like in the simulation that we did ultimately we had just three keys so if I gave a reduced task to everyone this reduced task would have been empty let's say for most of the machines but in other cases you have very large numbers of keys of intermediate keys that must be managed
+
+Okay, so you can decide the number of reducers based on the available resources that you have or any other criteria that may depend on the domain. So usually the typical thing that is done is that the key space, as I was saying, of the intermediate pairs is distributed evenly among the reducers.
+
+using a hash function, which is by the way something that is not done in the previous example. In the previous example you see that the data is actually distributed more or less based on the value because you have one reducer over here that handles all the values of Italy. So just one key, here you have two keys, and here you have three. So this even distribution is not applied in this example. But
+
+Basically what is done is to distribute images using a simple hash function. So the idea is that once you have decided how many reducers you want, so let B be the number of reduced tasks,
+
+specified by anyone. Then there is this partitioner, this function that translates the Dacian input, the key, which in the previous example was Italy, France, so a country or a category, as we did in the simulation, and the hash function translates
+
+the key into a number that goes from zero to p minus one, which is ultimately the ID of the one ID of a reducer. So this means that, yeah, keys ultimately end up usually in a random manner, which means that, okay, it's not always exactly an even distribution, but more or less. Okay, so ultimately,
+
+This output is stored in separate files, so one per reducer, and each file is ultimately tested for one of the reduced tasks. And the reduced task goes to every map task and collects the file that belongs to such a reducer.
+
+Of course, this may not always be the best strategy. So, the simplest partitioner approximately assigns the same number of keys to each producer.
+
+which in some cases makes for an even distribution of the workload, but not necessary because it's based just on the key. But you can have cases where some keys have huge amounts of values and other keys have not many. So there could be an imbalance in the amount of data associated with each.
+
+with each key. So for instance, if you want to do the word counting example, it's quite frequent that a large data set of text, you have few words that appear quite a lot and many words, like a long tail of words that appear only occasionally. So in this case, you can have just this distribution by key can create some imbalance.
+
+In many cases it works well, but just to say, not necessarily. Ultimately, you can solve this potential imbalance in distribution by tuning the number of reducers. So how do we choose the number of reducers? Well, there are several options.
+
+First one, you can just decide to create one single global reduced task that collects everything, which, by the way, was this option over here that we had. So you give all the intermediate output to just one person that does everything.
+
+This is what was happening in the very first implementation of what produced, by the way. But of course, it can become a bottleneck for large jobs. It could have become a bottleneck even just in this case with just three keys, but imagine with thousands of keys, right? Or even more. A reasonable solution can indeed have one task per CPU or per machine, depending on how
+
+views available you have in each machine, where potentially each task receives multiple keys. Of course, it's a larger situation than the one we did in the simulation, where we had only three keys, so it didn't make sense to have one reduced task per machine.
+
+But assume that you have, I don't know, in one of the groups you were, I don't know, 15 maybe. Assume that you have 150 keys, okay? Then it can make sense to create just 10 reduced tasks, one per machine, and each machine gets around 15 keys. Hopefully this distributes the workload quite evenly. So this is an intermediate solution.
+
+Another solution that often works very well is instead to create multiple tasks per CPU or per machine, where ultimately each task has fewer keys, right? And each CPU or each machine is in charge of multiple tasks. So instead of having 10 tasks with 15 keys per task, I can decide to have, I don't know,
+
+30 tasks with 5 keys in each task. Okay, let me write this down just to make sure. So we have 15 notes with 150 keys. So one option is to have 10 reduced tasks with
+
+15, no sorry, I'm getting confused. So it's 15 reduced tasks with 10, 15 reduced tasks with 10 keys each. Or let's say 30 reduced tasks with half keys.
+
+So with five keys each. Okay, now the numbers should make sense. 150 and 150, okay, right. Now you may wonder what would be the point of increasing the number of reduced tasks which are smaller. So I have more tasks that are smaller, right? And ultimately, if the data is evenly distributed among the keys, then this means that
+
+Each machine, each node will, in this case, will do two tasks instead of one, and the amount of data that is handled is exactly the same. Plus with an overhead, because you have to start up a new process, close a new process, so
+
+The fact of having multiple tasks to do adds computational work that takes away some time. Okay, not a lot of time, but still some time, right? Why does it make sense? It can make sense in some cases if the data is not, if the values are not evenly distributed among the keys. So you may have some situation where you have some keys
+
+that have a huge amount of values and then you have others that are very, that have very few. Like we had in the example over here. You have Italy, which has a huge amount of values and then you have others with very few. All right. So if you have, if you make multiple tasks, sorry, let's do the other way around. If you have only one task per machine,
+
+then what happens is that if one of the machines gets the key that contains a huge amount of value, then it takes much longer for that machine to finish compared to the others. So the other 14 will finish very quickly,
+
+But the one that was unlucky, maybe it will take a long time to complete, right? While the others just sit there. Maybe it happened in some cases in your simulation. You had some people who were faster in doing the work and others who struggled a bit more, right? If you increase the number of tasks, then you reduce the chance of having someone struggling behind.
+
+because you make the pieces of work smaller. So if someone struggles with a piece of work, then they can just do the one and the others can carry out the other tasks. So you may have one node in this case that focuses only on one task,
+
+and then you have other nodes that maybe it was the task that was more complex, so it was not the problem of the machine, it was the problem of the data,
+
+The other 14 nodes can proceed with the other 29 tasks. So maybe you will have nodes that do not just two, but will do three or four tasks, but they do it in a faster manner, right? So ultimately the one struggling behind with the other being idle, then you get to a situation more like this, where the workload of the struggler
+
+of the one that was struggling is reduced and the others carry on the rest. So the more you fragment the workload, the more tasks you create with a smaller workload, then the less the chance of having this struggling situation.
+
+Of course you don't want to fragment too much because then it becomes just a huge overhead in terms of switching from one task to the other. But this is, in general, a good strategy in order to avoid these kind of problems. This is something that you can achieve if you assign, for instance, one task per key.
+
+So then you have this one that handles Italy, will take a long time to handle just Italy, and will do just that. This one that got lucky at the beginning with Belgium, then it can handle also the task for Spain and then the task for USA in the same time that the first one does only Italy. Now ultimately choosing the right number of producers, as some say, is more art than science.
+
+means that there is no scientific rule to say, "Okay, this is the way you should create, assign the number of reducers." There are rules of thumb, like this one, creating a bit more tasks per machine. And there are also other rules of thumb that should be considered. For instance, usually it's considered a good number of partitions
+
+if each task takes, I don't know, actually five minutes, it's quite a lot. Now, okay, let me go back to this slide and I have to update this because it goes in a bit of a conflict with what we will see in Spark. In Spark, the guidelines are slightly different. So let me go back to this slide and I will correct this and we'll get back to it later on. But okay, the point is,
+
+There is no precise rule. It's something that you have to consider on a case-by-case. The important thing is to know what are the implications of doing one number rather than another.
+
+So ultimately, to give a complete picture of the framework, of the paradigm, the main things that a programmer has to specify are the map function, the reduce function. If you want, you can also apply the combiner.
+
+and if you want you can also specify a different criteria for partitioning that is different from just the default hash partitioner that is used by the framework. Like maybe you have some knowledge of the domain that you can use in order to partition the data in a different manner. It happened to me just once in my career to recommend.
+
+in my projects to have to specify a custom partition. So it's not a typical thing to do, but it's something that you can do. And then the point is that the framework handles everything else. So which makes the application of this MapReduce paradigm rather simple, right? Accessible to everyone, right? It's not particularly complicated to do.
+
+big data analysis when all you have to do is to specify the map and the reduced function. Everything clear up to this point? All right. I went a bit fast, but because also we did the simulation, so I think that that helps. All right, so this is the overall framework, and depending on what you want to do, then you have to fit
+
+the logic of your application within this map and reduce function. And actually it's quite powerful because I would say that within this MapReduce framework you could fit any kind of analytical application. In some cases it may become more complex to write it down but still it's doable. So
+
+For instance, if you wanted to implement some iterative machine learning algorithm within Acrodeus, it's not that straightforward, but still it's something that can be done. Of course, more complex solutions may require you to do multiple iterations of these methods, multiple changes.
+
+So you do MapReduce, MapReduce, MapReduce, and swap depending on what you have to do. So just to give an overview of all the basic algorithms that can fit the MapReduce paradigm.
+
+If you just need to do some filtering on the data set, of course, this is something that usually that you can do even without the reduce function. It's just a map function where you apply a filter locally on the different blocks of data. So I can just skip this quite fast.
+
+summarization kind of algorithms. That's where you have to compute sums. For instance, you want to do an average, but still you want to aggregate the data. This is the most typical operation and we've seen how to do it. The point is that in the map function, you want to create key value pairs, where the key is your grouping criteria.
+
+And then you have your values, which is what you want to aggregate. So then all the values with the same grouping criteria, and the same producer, and you can aggregate all the values with or without combining, depending on what you have. And the pattern looks something like this. You can also do joins, which, okay, maybe you say, "How do we do joins within the MapReduce framework?"
+
+This is a bit more complex in the sense that what you need is a different mapper depending on the data set. So if you want to do a join, it means that you have two different data sets that you want to join together. So you most probably want a mapper that is map task that is independent. The task per se can be the same, but you have to...
+
+create a different output depending on the data that you're reading. So assume in this example you have two data sets, one of professors with the courses that they teach and one is the data set of students with the courses that they follow. And you want to find the match. All the triples: professor teaching course followed by student. All the tuples
+
+of all the matches by course, right? So the course is the join key, which is the attribute in common with the data set. So the point in order to create the join is that you want all the professors and students of the same course to end up in the same machine, so that then you can create the result of the join. So if you're reading the professor's data set, you want to create
+
+key value pair like this one, where the key is the course, the shared key, the join key. The value is not just the record from the original data set, in some cases the professor, but you also need to specify that this is a professor. Because then when you go into the reducer and you connect all the records with the same key, so all the people that belong to an event course
+
+You have to know whether they are professors or students in order to create the couples of the matches. So you need to have here some sort of flag that can be any kind of value that you're able to interpret. It can be a number, it can be the full string, professor, student, label, whatever. The point is something that you can use to distinguish whether this comes from dataset one or dataset two.
+
+So then, in the reduce function, you can iterate on the records, and you have to create the couples of the matches. So first you iterate on all the records that come from dataset one, and for all of them, you create the matches with all the records that come from dataset two. So every professor teaching a given course will be matched with all the students following the same course. So ultimately you can create
+
+the result like this: professor, course, student. So, the join, which is, I would say, a simple operation in the MapReduce paradigm, still, it's not that immediate, let's say. Not complex, because once you understand it, you say, "Okay, fine." But at the beginning you say, "Okay, how does it work?" Okay, so this is the example. You have a couple of professors and a couple of students.
+
+of course professors for big data. And the join, you see there is only one student that has to be matched with the two professors of big data, so in the math output. These are the key value pairs that I returned. So for this, I returned big data as a key and professor Enrico, another key big data professor Matteo,
+
+And then for the students, I have this student and student. So then when I shuffle and sort, I will have a reducer that takes all the values for big data, which is here. So for big data, I have this list of key values, of values, sorry. This is the key, these are all the values. Two professors and one student. And then I have another key,
+
+in another reducer for data mining where there's only the student, there is not the professor in this data set. So ultimately this will create no results because there is no matching professor. Alright. Okay, so this is what the join pattern looks like.
+
+potentially different methods for all the different datasets or still a join like could be the same method that has an if condition inside that says, okay, if I'm reading a block of dataset A, then the label should be student. If it's from dataset B, the label should be professor or the other way around. I don't know. But still. Even the sorting with MapReduce,
+
+which is actually rather simple because you know that within the framework, within the paradigm, there is sorting that happens automatically. So if you want to sort by a given key, ultimately you can use... If you want to sort the dataset by a given attribute, you can just simply use that attribute as a sorting key, right?
+
+because ultimately all the data are sorted by the key within the framework. So then this comes natural if you have only one reducer. So assume that you have that all the intermediate output is given to just one reducer, right? And all the intermediate output is the key, which is the attribute by which you want to sort by, and then the values, which are the other values.
+
+which will not be aggregated, you just want to sort by the key, right? So the aggregation function will be nothing. You just use the key to do the sorting. And since the sorting is done by each reducer, then you know that the data would be automatically sorted by the key. But what if you have multiple reducers? What does it mean to sort the data across multiple machines? Now, there is
+
+possibility of using specific partitioners that are dedicated to this kind of task, which essentially they do some sampling on the data to understand how many keys are there in the data set that you want to analyze, and they distribute
+
+the keys among the machines in a way that they are sorted across the different machines. So there is a sorting option knowing that the first keys are given to the first machine, the other keys are given to the second one. So there is a way to keep a notion of sorting across different machines. You just have to use partitioning functions that are specific for this kind of operation.
+
+Okay, and this comes, as I was saying, quite free, meaning that it's just the framework that implements naturally the sorting. And then you can have something more complex that requires, for instance, multiple stages of macro news.
+
+where the output of the reduce becomes the input of the new of the new model. Now, in the original paradigm, this and in the original implementation by HADOO, this means that the output of the reducer is stored in the distributed file system. So this intermediate output here is just local to the machine.
+
+But once you compute the final output, this gets saved to the distributed file system, and then you start back with a new MapReduce couple, let's say, where you read again from the distributed file system and do the further process, right? Which, as we will see, is not the best way to do a chain MapReduce because it's not very efficient, right?
+
+But this is how it was at the beginning and we will see how this is overcome by FAR in particular. It still can make sense in some cases to have
+
+the output of the first macro use to be stored in addition with the file system. If this output has to be reused by multiple applications, not just one, then okay, you have some sort of materialized view, you have completed it once, then you park it there, and it's going to be reused by other applications. So, okay, it's not always a bad thing, right? It depends.
+
+So what is an example of a task, not an algorithm, but a kind of analysis that requires multiple steps of micro news. For instance, I want to do a comparison of the sales of products on different months, sorry, of the same month on different years. So I want to compare the sales of January 2010 with the sales of January 2011.
+
+This requires two stages, because first what you have to do is to compute the total amount of sales for each product, of course, and for every month of every year, both 2010 and 2011.
+
+So this means that you want to group by this set of keys, month, year and product, and for each combination you want the total quantity sold, for instance, quantity, revenue, whatever, and you compute the sum for each combination, month, year, product. Then you want a second stage where you do the comparison on the same month of different years.
+
+So in this case, you have to do another step where you group the data, you remove the year, essentially, from the key and you put it in the value. Because then you want to do the comparison of 2010 to 2011, so for the same month. So the grouping key becomes months and product. So for instance, it could be January for a kind of product, an iPhone.
+
+and in the values you have the values. In 2010 I solved X, in 2011 I solved Y. And then you can compute, I don't know, the fraction, the difference, whatever kind of comparison you want to do. Of course you may have also multiple years, not just two years, in that case the kind of function that you do here may differ, but that's the point. Okay, well this was the last slide, I guess. Yes?
+
+All right, questions? All right, let me take a, we still have a few minutes, I know you're, last slide, so let's go. Now let me just take a quick glimpse at what we will focus on next, in the next class. Okay, so in the next class we will talk about
+
+YARN, which is the Research Negotiator, is the tool that is in charge of assigning the tasks to the different machines, which is something that some of you did. I mean, the representatives that I called from each cluster that I, when I asked them to give the tasks to the different persons, essentially they took the role of the Research Negotiator, which is the one that decides tasks.
+
+where each task, where the different tasks must be allocated on the different machines. So we will see this role as well, which is particularly important. We will go a bit more into the details of the implementation. Right now we focus more on the paradigm in general of the ecosystem.
+
+Then we will discuss some details about the implementation by Hadoop and how it has evolved in the current version of the one that is most used by everyone, which is Apache Spark, and how also this one has evolved into SQL on Hadoop, which means essentially writing operations not anymore in the MapReduce style, but using simple SQL, which
+
+spoiler is essentially translated into market use jobs. So just to give a quick overview of the topic of next class, which will be not Tuesday but Wednesday. So for next week, Tuesday, there will be module two for DTM only.
+
+with Professor Danza, the four hours of Tuesday, and then I come back on Wednesday to continue module one for everyone. All right.
+
+That's it. So we finished a bit earlier as promised. See you next week. And I will put the recordings on the app to watch.
